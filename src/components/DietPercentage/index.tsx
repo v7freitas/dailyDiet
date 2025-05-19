@@ -1,11 +1,22 @@
 import { Container, Description, Icon, Percentage } from "./styles";
 
-export function DietPercentage() {
+type Props = {
+  type?: "PRIMARY" | "SECONDARY";
+  percentage: string;
+};
+
+export function DietPercentage({
+  type = "PRIMARY",
+  percentage,
+  ...rest
+}: Props) {
   return (
-    <Container type="PRIMARY">
-      <Percentage>67%</Percentage>
-      <Description>das refeições dentro da dieta</Description>
-      <Icon type="PRIMARY" />
+    <Container type={type} {...rest}>
+      <Percentage>{percentage}%</Percentage>
+      <Description>
+        das refeições {type === "PRIMARY" ? "dentro" : "fora"} da dieta
+      </Description>
+      <Icon type={type} />
     </Container>
   );
 }
