@@ -7,9 +7,9 @@ import {
   Title,
   TrashIcon,
 } from "./styles";
-import theme from "src/theme";
+import { TouchableOpacityProps } from "react-native";
 
-type Props = {
+type Props = TouchableOpacityProps & {
   title: string;
   type?: ButtonStyleType;
 };

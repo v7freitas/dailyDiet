@@ -36,17 +36,20 @@ export const Title = styled.Text<Props>`
 export const PlusIcon = styled(Plus).attrs(({ theme }) => ({
   size: 18,
   color: theme.COLORS.WHITE,
-  marginRight: 12,
-}))``;
+}))`
+  margin-right: 12px;
+`;
 
 export const PencilIcon = styled(PencilSimpleLine).attrs(({ theme }) => ({
   size: 18,
   color: theme.COLORS.WHITE,
-  marginRight: 12,
-}))``;
+}))`
+  margin-right: 12px;
+`;
 
 export const TrashIcon = styled(Trash).attrs(({ theme }) => ({
   size: 18,
   color: theme.COLORS.GRAY_1,
-  marginRight: 12,
-}))``;
+}))`
+  margin-right: 12px;
+`;
