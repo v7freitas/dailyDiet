@@ -4,11 +4,11 @@ import styled from "styled-components/native";
 
 export type ContainerTypeStyleProps = "PRIMARY" | "SECONDARY";
 
-type DietProps = {
+type DietPercentageProps = {
   type: ContainerTypeStyleProps;
 };
 
-export const Container = styled.View<DietProps>`
+export const Container = styled.View<DietPercentageProps>`
   flex: 1;
   min-height: 102px;
   max-height: 102px;
@@ -39,7 +39,7 @@ export const Description = styled.Text`
   `}
 `;
 
-export const Icon = styled(ArrowUpRight).attrs<DietProps>(
+export const Icon = styled(ArrowUpRight).attrs<DietPercentageProps>(
   ({ theme, type }) => ({
     size: 24,
     color: type === "PRIMARY" ? theme.COLORS.GREEN_DARK : theme.COLORS.RED_DARK,
