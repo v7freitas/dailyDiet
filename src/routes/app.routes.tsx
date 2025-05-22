@@ -12,21 +12,7 @@ export function AppRoutes() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="home" component={Home} />
-      <Stack.Screen
-        name="newMeal"
-        component={NewMeal}
-        options={{
-          headerStyle: {
-            backgroundColor: COLORS.GRAY_5,
-          },
-          headerTitleStyle: {
-            color: COLORS.GRAY_1,
-            fontSize: theme.FONT_SIZE.XL,
-            fontFamily: theme.FONT_FAMILY.BOLD,
-          },
-          headerBackButtonMenuEnabled: true,
-        }}
-      />
+      <Stack.Screen name="newMeal" component={NewMeal} />
     </Stack.Navigator>
   );
 }
