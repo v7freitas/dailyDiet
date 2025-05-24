@@ -1,10 +1,30 @@
 import { useTheme } from "styled-components/native";
-import { Container } from "./styles";
+import { Container, InputContent, Label } from "./styles";
 import { TextInputProps } from "react-native";
 
-type Props = TextInputProps & {};
+type Props = TextInputProps & {
+  label: string;
+  isTextArea?: boolean;
+};
 
-export function Input({ ...rest }: Props) {
+export function Input({ label, isTextArea = false, ...rest }: Props) {
   const { COLORS } = useTheme();
-  return <Container placeholderTextColor={COLORS.GRAY_1} {...rest} />;
+  return (
+    <Container {...rest}>
+      <Label>{label}</Label>
+      {isTextArea ? (
+        <InputContent
+          multiline={true}
+          placeholderTextColor={COLORS.GRAY_1}
+          style={{
+            minHeight: 120,
+            maxHeight: 120,
+            textAlignVertical: "top",
+          }}
+        />
+      ) : (
+        <InputContent placeholderTextColor={COLORS.GRAY_1} />
+      )}
+    </Container>
+  );
 }

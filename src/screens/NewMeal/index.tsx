@@ -1,17 +1,22 @@
-import { Input } from "@components/Input";
-import { View } from "react-native";
-import { Container } from "./styles";
+import { Container, ContainerRow, Form } from "./styles";
 import { HeaderMeal } from "@components/HeaderMeal";
+import { Input } from "@components/Input";
+
 import { useTheme } from "styled-components/native";
 
 export function NewMeal() {
   const { COLORS } = useTheme();
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.GRAY_5 }}>
-      <HeaderMeal title="Nova refeição" type={"DEFAULT"} />
-      <Container>
-        <Input />
-      </Container>
-    </View>
+    <Container>
+      <HeaderMeal title="Nova refeição" type={"PRIMARY"} />
+      <Form>
+        <Input label={"Nome"} />
+        <Input label={"Descrição"} isTextArea />
+        <ContainerRow>
+          <Input label={"Data"} />
+          <Input label={"Hora"} />
+        </ContainerRow>
+      </Form>
+    </Container>
   );
 }

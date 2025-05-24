@@ -9,7 +9,7 @@ type Props = {
 };
 
 export const Container = styled.View<Props>`
-  width: 100%;
+  flex: 1;
 
   flex-direction: row;
   align-items: center;
@@ -20,7 +20,7 @@ export const Container = styled.View<Props>`
       : type === "SECONDARY"
       ? theme.COLORS.RED_LIGHT
       : theme.COLORS.GRAY_5};
-  padding: 24px;
+  padding: 0 24px 24px;
 
   min-height: 132px;
   max-height: 132px;
