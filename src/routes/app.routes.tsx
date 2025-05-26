@@ -11,8 +11,8 @@ export function AppRoutes() {
   const { COLORS } = useTheme();
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="home" component={Home} />
-      <Stack.Screen name="newMeal" component={NewMeal} />
+      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="NewMeal" component={NewMeal} />
     </Stack.Navigator>
   );
 }

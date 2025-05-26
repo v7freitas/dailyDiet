@@ -1,7 +1,9 @@
 import { TextInput } from "react-native";
 import styled, { css } from "styled-components/native";
 
-export const Container = styled.View``;
+export const Container = styled.View`
+  margin-bottom: 24px;
+`;
 
 export const Label = styled.Text`
   ${({ theme }) => css`
@@ -13,10 +15,6 @@ export const Label = styled.Text`
 `;
 
 export const InputContent = styled(TextInput)`
-  width: 100%;
-
-  margin-bottom: 24px;
-
   min-height: 48px;
   max-height: 48px;
 

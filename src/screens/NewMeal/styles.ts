@@ -22,5 +22,4 @@ export const ContainerRow = styled.View`
   flex-direction: row;
 
   gap: 24px;
-  margin-bottom: 24px;
 `;
