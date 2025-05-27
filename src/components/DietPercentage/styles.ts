@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "phosphor-react-native";
+import { TouchableOpacity } from "react-native";
 import { css } from "styled-components/native";
 import styled from "styled-components/native";
 
@@ -8,7 +9,7 @@ type DietPercentageProps = {
   type: ContainerTypeStyleProps;
 };
 
-export const Container = styled.View<DietPercentageProps>`
+export const Container = styled(TouchableOpacity)<DietPercentageProps>`
   flex: 1;
   min-height: 102px;
   max-height: 102px;

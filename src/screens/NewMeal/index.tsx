@@ -24,8 +24,12 @@ export function NewMeal() {
     navigation.navigate("Home");
   }
 
+  function handleRegisterMeal() {
+    navigation.navigate("Feedback");
+  }
+
   return (
-    <Container>
+    <Container type="DEFAULT">
       <HeaderMeal
         title="Nova refeição"
         type={"DEFAULT"}
@@ -55,7 +59,7 @@ export function NewMeal() {
             />
           ))}
         </ContainerRow>
-        <Button title={"Cadastrar refeição"} />
+        <Button title={"Cadastrar refeição"} onPress={handleRegisterMeal} />
       </Form>
     </Container>
   );

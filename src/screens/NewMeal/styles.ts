@@ -1,9 +1,19 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components/native";
+import { HeaderMealStyleButtonType } from "@components/HeaderMeal/styles";
 
-export const Container = styled(SafeAreaView)`
+type Props = {
+  type: HeaderMealStyleButtonType;
+};
+
+export const Container = styled(SafeAreaView)<Props>`
   flex: 1;
-  background-color: ${({ theme }) => theme.COLORS.GRAY_5};
+  background-color: ${({ theme, type }) =>
+    type === "DEFAULT"
+      ? theme.COLORS.GRAY_5
+      : type === "PRIMARY"
+      ? theme.COLORS.GREEN_LIGHT
+      : theme.COLORS.RED_LIGHT};
 `;
 
 export const Form = styled.View`
