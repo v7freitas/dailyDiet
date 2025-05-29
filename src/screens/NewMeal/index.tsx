@@ -7,13 +7,32 @@ import { useState } from "react";
 import { Text } from "react-native";
 import { useTheme } from "styled-components/native";
 import { useNavigation } from "@react-navigation/native";
+import { mealCreate } from "@storage/meal/mealCreate";
+
+export type NewMealProps = {
+  name: string;
+  description: string;
+  date: string;
+  hour: string;
+  isOnDiet: boolean;
+};
 
 export function NewMeal() {
   const { FONT_FAMILY } = useTheme();
 
   const navigation = useNavigation();
 
-  const [isActive, setIsActive] = useState(true);
+  const [newMeal, setNewMeal] = useState<NewMealProps>({
+    name: "",
+    description: "",
+    date: "",
+    hour: "",
+    isOnDiet: true,
+  });
+
+  const handleChange = (field: string, value: string | boolean) => {
+    setNewMeal((prev) => ({ ...prev, [field]: value }));
+  };
 
   const isOnDietStatus = [
     { title: "Sim", type: "GREEN" },
@@ -24,8 +43,14 @@ export function NewMeal() {
     navigation.navigate("Home");
   }
 
-  function handleRegisterMeal() {
-    navigation.navigate("Feedback");
+  async function handleRegisterMeal() {
+    try {
+      await mealCreate(JSON.stringify(newMeal));
+
+      navigation.navigate("Feedback");
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -36,11 +61,30 @@ export function NewMeal() {
         onPress={handleGoBack}
       />
       <Form>
-        <Input label={"Nome"} />
-        <Input label={"Descrição"} isTextArea />
+        <Input
+          label={"Nome"}
+          value={newMeal.name}
+          onChangeText={(value) => handleChange("name", value)}
+        />
+        <Input
+          label={"Descrição"}
+          isTextArea
+          value={newMeal.description}
+          onChangeText={(value) => handleChange("description", value)}
+        />
         <ContainerRow>
-          <Input label={"Data"} style={{ flex: 1 }} />
-          <Input label={"Hora"} style={{ flex: 1 }} />
+          <Input
+            label={"Data"}
+            style={{ flex: 1 }}
+            value={newMeal.date}
+            onChangeText={(value) => handleChange("date", value)}
+          />
+          <Input
+            label={"Hora"}
+            style={{ flex: 1 }}
+            value={newMeal.hour}
+            onChangeText={(value) => handleChange("hour", value)}
+          />
         </ContainerRow>
         <Text style={{ fontFamily: FONT_FAMILY.BOLD, marginBottom: 8 }}>
           Está dentro da dieta?
@@ -48,12 +92,12 @@ export function NewMeal() {
         <ContainerRow style={{ flex: 1 }}>
           {isOnDietStatus.map((item) => (
             <IsOnDietButton
-              onPress={() => setIsActive(!isActive)}
+              onPress={() => handleChange("isOnDiet", item.title === "Sim")}
               title={item.title}
               type={item.title === "Sim" ? "GREEN" : "RED"}
               isActive={
-                (item.title === "Sim" && isActive) ||
-                (item.title === "Não" && !isActive)
+                (item.title === "Sim" && newMeal.isOnDiet) ||
+                (item.title === "Não" && !newMeal.isOnDiet)
               }
               key={item.title}
             />

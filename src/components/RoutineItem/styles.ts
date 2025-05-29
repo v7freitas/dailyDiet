@@ -21,6 +21,7 @@ export const Container = styled(TouchableOpacity)`
     background-color: ${theme.COLORS.GRAY_7};
     border: 1px solid ${theme.COLORS.GRAY_5};
   `}
+  margin-bottom: 8px;
 `;
 
 export const Hour = styled.Text`
