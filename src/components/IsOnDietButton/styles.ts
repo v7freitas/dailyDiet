@@ -1,7 +1,7 @@
 import { TouchableOpacity } from "react-native";
 import styled, { css } from "styled-components/native";
 
-export type IsOnDietButtonStyleColorProp = "GREEN" | "RED";
+export type IsOnDietButtonStyleColorProp = "PRIMARY" | "SECONDARY";
 
 type Props = {
   type?: string;
@@ -15,17 +15,17 @@ export const Container = styled(TouchableOpacity)<Props>`
   flex-direction: row;
   gap: 8px;
   background-color: ${({ theme, isActive, type }) =>
-    isActive && type === "GREEN"
+    isActive && type === "PRIMARY"
       ? theme.COLORS.GREEN_LIGHT
-      : isActive && type === "RED"
+      : isActive && type === "SECONDARY"
       ? theme.COLORS.RED_LIGHT
       : theme.COLORS.GRAY_6};
   border-radius: 6px;
   border: 1px solid
     ${({ theme, isActive, type }) =>
-      isActive && type === "GREEN"
+      isActive && type === "PRIMARY"
         ? theme.COLORS.GREEN_DARK
-        : isActive && type === "RED"
+        : isActive && type === "SECONDARY"
         ? theme.COLORS.RED_DARK
         : theme.COLORS.GRAY_6};
   align-items: center;
@@ -45,5 +45,5 @@ export const BulletIndicator = styled.View<Props>`
   height: 8px;
   border-radius: 50px;
   background-color: ${({ theme, type }) =>
-    type === "GREEN" ? theme.COLORS.GREEN_DARK : theme.COLORS.RED_DARK};
+    type === "PRIMARY" ? theme.COLORS.GREEN_DARK : theme.COLORS.RED_DARK};
 `;

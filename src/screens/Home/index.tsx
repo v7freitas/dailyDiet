@@ -11,81 +11,18 @@ import { ListEmpty } from "@components/ListEmpty";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useTheme } from "styled-components/native";
 import { mealsGetAll } from "@storage/meal/mealsGetAll";
-import { NewMealProps } from "@screens/NewMeal";
 
-// const DATA = [
-//   {
-//     title: "01.01.2023",
-//     data: [
-//       {
-//         hour: "08:00",
-//         title: "Café da manhã",
-//         type: "PRIMARY",
-//       },
-//       {
-//         hour: "10:00",
-//         title: "Lanche da manhã",
-//         type: "SECONDARY",
-//       },
-//       {
-//         hour: "12:00",
-//         title: "Almoço",
-//         type: "PRIMARY",
-//       },
-//       {
-//         hour: "15:00",
-//         title: "Lanche da tarde",
-//         type: "SECONDARY",
-//       },
-//       {
-//         hour: "18:00",
-//         title: "Jantar",
-//         type: "PRIMARY",
-//       },
-//     ],
-//   },
-//   {
-//     title: "02.01.2023",
-//     data: [
-//       {
-//         hour: "08:00",
-//         title: "Café da manhã",
-//         type: "PRIMARY",
-//       },
-//       {
-//         hour: "10:00",
-//         title: "Lanche da manhã",
-//         type: "SECONDARY",
-//       },
-//       {
-//         hour: "12:00",
-//         title: "Almoço",
-//         type: "PRIMARY",
-//       },
-//       {
-//         hour: "15:00",
-//         title: "Lanche da tarde",
-//         type: "SECONDARY",
-//       },
-//       {
-//         hour: "18:00",
-//         title: "Jantar",
-//         type: "PRIMARY",
-//       },
-//     ],
-//   },
-// ];
-
-type RoutineItemProps = {
-  hour: string;
+type SectionDataMeal = {
   title: string;
-  type: "PRIMARY" | "SECONDARY";
+  data: Array<{
+    hour: string;
+    name: string;
+    type: "PRIMARY" | "SECONDARY";
+  }>;
 };
 
 export function Home() {
-  const [dietList, setDietList] = useState<
-    { title: string; data: RoutineItemProps[] }[]
-  >([]);
+  const [dietList, setDietList] = useState<SectionDataMeal[]>([]);
 
   const navigation = useNavigation();
 
@@ -99,39 +36,59 @@ export function Home() {
     navigation.navigate("DietStatistics");
   }
 
+  function handleRemoveMeal() {}
+
   async function fetchDietList() {
     try {
-      const data = await mealsGetAll();
-      // const formattedData = formatMealsByDate(data);
+      const response = await mealsGetAll();
+
+      const data = (response ?? []).map((item) =>
+        typeof item === "string" ? JSON.parse(item) : item
+      );
+
+      // Agrupando por data
+      const grouped = data.reduce((acc, item) => {
+        const date = item.date;
+        const existingGroup = acc.find(
+          (group: SectionDataMeal) => group.title === date
+        );
+
+        if (existingGroup) {
+          existingGroup.data.push({
+            hour: item.hour,
+            name: item.name,
+            type: item.isOnDiet ? "PRIMARY" : "SECONDARY",
+          });
+        } else {
+          acc.push({
+            title: date,
+            data: [
+              {
+                hour: item.hour,
+                name: item.name,
+                type: item.isOnDiet ? "PRIMARY" : "SECONDARY",
+              },
+            ],
+          });
+        }
+
+        return acc;
+      }, []);
+
+      // Ordenando os grupos por data (mais recente para o mais antigo)
+      const groupedAndSorted = grouped
+        .map((group: SectionDataMeal) => ({
+          ...group,
+          // Ordenando os itens de cada seção por hora (crescente)
+          data: group.data.sort((a, b) => a.hour.localeCompare(b.hour)),
+        }))
+        .sort((a: SectionDataMeal, b: SectionDataMeal) => {
+          return new Date(b.title).getTime() - new Date(a.title).getTime();
+        });
+
+      setDietList(groupedAndSorted);
     } catch (error) {}
   }
-
-  // function formatMealsByDate(meals: any[]) {
-  //   const grouped = meals.reduce((accumulator, meal) => {
-  //     const date = meal.date;
-
-  //     if (!accumulator[date]) {
-  //       accumulator[date] = [];
-  //     }
-
-  //     accumulator[date].push({
-  //       hour: meal.hour,
-  //       title: meal.name,
-  //       type: meal.isOnDiet ? "PRIMARY" : "SECONDARY",
-  //     });
-
-  //     return accumulator;
-  //   }, {} as Record<string, RoutineItemProps[]>);
-
-  //   return Object.keys(grouped)
-  //     .sort((a, b) => new Date(b).getTime() - new Date(a).getTime()) // ordena por data decrescente
-  //     .map((date) => ({
-  //       title: date,
-  //       data: grouped[date].sort((a: { hour: string }, b: { hour: any }) =>
-  //         a.hour.localeCompare(b.hour)
-  //       ), // ordena por hora
-  //     }));
-  // }
 
   useFocusEffect(
     useCallback(() => {
@@ -153,7 +110,7 @@ export function Home() {
         sections={dietList}
         keyExtractor={(item, index) => item.hour + index}
         renderItem={({ item }) => (
-          <RoutineItem hour={item.hour} title={item.title} type={item.type} />
+          <RoutineItem hour={item.hour} title={item.name} type={item.type} />
         )}
         renderSectionHeader={({ section: { title } }) => (
           <Text
@@ -163,7 +120,11 @@ export function Home() {
           </Text>
         )}
         ListEmptyComponent={() => <ListEmpty />}
-        contentContainerStyle={dietList.length === 0 && { flex: 1 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: dietList.length === 0 ? "center" : "flex-start",
+        }}
+        showsVerticalScrollIndicator={false}
       />
     </Container>
   );
