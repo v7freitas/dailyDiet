@@ -33,24 +33,24 @@ export function NewMeal() {
     isOnDiet: true,
   });
 
-  const handleChange = (field: string, value: string | boolean) => {
+  const updateMealField = (field: string, value: string | boolean) => {
     setNewMeal((prev) => ({ ...prev, [field]: value }));
   };
 
-  const dateMaskChange = (date: string) => {
-    let value = date.replace(/\D/g, "");
-    if (value.length > 8) value = value.slice(0, 8);
+  const dateMaskAndFieldChange = (date: string) => {
+    let dateMasked = date.replace(/\D/g, "");
+    if (dateMasked.length > 8) dateMasked = dateMasked.slice(0, 8);
 
-    if (value.length >= 5) {
-      value = value.replace(/(\d{2})(\d{2})(\d{1,4})/, "$1/$2/$3");
-    } else if (value.length >= 3) {
-      value = value.replace(/(\d{2})(\d{1,2})/, "$1/$2");
+    if (dateMasked.length >= 5) {
+      dateMasked = dateMasked.replace(/(\d{2})(\d{2})(\d{1,4})/, "$1/$2/$3");
+    } else if (dateMasked.length >= 3) {
+      dateMasked = dateMasked.replace(/(\d{2})(\d{1,2})/, "$1/$2");
     }
 
-    setNewMeal((prev) => ({ ...prev, date: value }));
+    setNewMeal((prev) => ({ ...prev, date: dateMasked }));
   };
 
-  const hourMaskChange = (hour: string) => {
+  const hourMaskAndFieldChange = (hour: string) => {
     // Remove all non-digit characters
     const cleaned = hour.replace(/\D/g, "").slice(0, 4); // Limita a 4 dígitos
 
@@ -96,7 +96,7 @@ export function NewMeal() {
 
       await mealCreate(JSON.stringify(newMeal));
 
-      console.log("Refeição cadastrada com sucesso!", newMeal);
+      navigation.navigate("Feedback");
     } catch (error) {
       if (error instanceof AppError) {
         Alert.alert("Nova refeição", error.message);
@@ -131,27 +131,27 @@ export function NewMeal() {
         <Input
           label={"Nome"}
           value={newMeal.name}
-          onChangeText={(value) => handleChange("name", value)}
+          onChangeText={(value) => updateMealField("name", value)}
         />
         <Input
           label={"Descrição"}
           isTextArea
           value={newMeal.description}
-          onChangeText={(value) => handleChange("description", value)}
+          onChangeText={(value) => updateMealField("description", value)}
         />
         <ContainerRow>
           <Input
             label={"Data"}
             style={{ flex: 1 }}
             value={newMeal.date}
-            onChangeText={(date) => dateMaskChange(date)}
+            onChangeText={(date) => dateMaskAndFieldChange(date)}
             keyboardType="numeric"
           />
           <Input
             label={"Hora"}
             style={{ flex: 1 }}
             value={newMeal.hour}
-            onChangeText={(hour) => hourMaskChange(hour)}
+            onChangeText={(hour) => hourMaskAndFieldChange(hour)}
             keyboardType="numeric"
           />
         </ContainerRow>
@@ -161,7 +161,7 @@ export function NewMeal() {
         <ContainerRow style={{ flex: 1 }}>
           {isOnDietStatus.map((item) => (
             <IsOnDietButton
-              onPress={() => handleChange("isOnDiet", item.title === "Sim")}
+              onPress={() => updateMealField("isOnDiet", item.title === "Sim")}
               title={item.title}
               type={item.title === "Sim" ? "PRIMARY" : "SECONDARY"}
               isActive={

@@ -46,6 +46,12 @@ export function Home() {
         typeof item === "string" ? JSON.parse(item) : item
       );
 
+      // Função para converter dd/mm/yyyy → yyyy-mm-dd
+      const parseDateToISO = (dateBR: string) => {
+        const [dd, mm, yyyy] = dateBR.split("/");
+        return `${yyyy}-${mm}-${dd}`;
+      };
+
       // Agrupando por data
       const grouped = data.reduce((acc, item) => {
         const date = item.date;
@@ -83,7 +89,10 @@ export function Home() {
           data: group.data.sort((a, b) => a.hour.localeCompare(b.hour)),
         }))
         .sort((a: SectionDataMeal, b: SectionDataMeal) => {
-          return new Date(b.title).getTime() - new Date(a.title).getTime();
+          return (
+            new Date(parseDateToISO(b.title)).getTime() -
+            new Date(parseDateToISO(a.title)).getTime()
+          );
         });
 
       setDietList(groupedAndSorted);
