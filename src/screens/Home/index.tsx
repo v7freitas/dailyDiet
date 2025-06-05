@@ -12,17 +12,20 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useTheme } from "styled-components/native";
 import { mealsGetAll } from "@storage/meal/mealsGetAll";
 
+type Meal = {
+  hour: string;
+  name: string;
+  type: "PRIMARY" | "SECONDARY";
+  description: string;
+};
+
 type SectionDataMeal = {
   title: string;
-  data: Array<{
-    hour: string;
-    name: string;
-    type: "PRIMARY" | "SECONDARY";
-  }>;
+  data: Meal[];
 };
 
 export function Home() {
-  const [dietList, setDietList] = useState<SectionDataMeal[]>([]);
+  const [dietList, setDietList] = useState<[]>([]);
 
   const navigation = useNavigation();
 
@@ -32,11 +35,42 @@ export function Home() {
     navigation.navigate("NewMeal");
   }
 
+  function handleMealDetails() {
+    navigation.navigate("MealDetails", {
+      type: "PRIMARY",
+      name: "Exemplo de Refeição",
+      description: "Descrição da refeição",
+      date: "01/01/2023",
+      hour: "12:00",
+    });
+  }
+
+  const renderItem = ({
+    item,
+    section,
+  }: {
+    item: Meal;
+    section: SectionDataMeal;
+  }) => (
+    <RoutineItem
+      hour={item.hour}
+      title={item.name}
+      type={item.type}
+      onPress={() => {
+        navigation.navigate("MealDetails", {
+          type: item.type,
+          name: item.name,
+          description: item.description,
+          date: section.title,
+          hour: item.hour,
+        });
+      }}
+    />
+  );
+
   function handleDietStatistics() {
     navigation.navigate("DietStatistics");
   }
-
-  function handleRemoveMeal() {}
 
   async function fetchDietList() {
     try {
@@ -64,6 +98,7 @@ export function Home() {
             hour: item.hour,
             name: item.name,
             type: item.isOnDiet ? "PRIMARY" : "SECONDARY",
+            description: item.description,
           });
         } else {
           acc.push({
@@ -73,6 +108,7 @@ export function Home() {
                 hour: item.hour,
                 name: item.name,
                 type: item.isOnDiet ? "PRIMARY" : "SECONDARY",
+                description: item.description,
               },
             ],
           });
@@ -82,7 +118,7 @@ export function Home() {
       }, []);
 
       // Ordenando os grupos por data (mais recente para o mais antigo)
-      const groupedAndSorted = grouped
+      const mealsGroupedAndSorted = grouped
         .map((group: SectionDataMeal) => ({
           ...group,
           // Ordenando os itens de cada seção por hora (crescente)
@@ -95,7 +131,7 @@ export function Home() {
           );
         });
 
-      setDietList(groupedAndSorted);
+      setDietList(mealsGroupedAndSorted);
     } catch (error) {}
   }
 
@@ -108,7 +144,7 @@ export function Home() {
   return (
     <Container>
       <Header />
-      <DietPercentage percentage={"80"} onPress={handleDietStatistics} />
+      <DietPercentage percentage={80} onPress={handleDietStatistics} />
       <Text>Refeições</Text>
       <Button
         title={"Nova refeição"}
@@ -118,9 +154,7 @@ export function Home() {
       <SectionList
         sections={dietList}
         keyExtractor={(item, index) => item.hour + index}
-        renderItem={({ item }) => (
-          <RoutineItem hour={item.hour} title={item.name} type={item.type} />
-        )}
+        renderItem={renderItem}
         renderSectionHeader={({ section: { title } }) => (
           <Text
             style={{ fontFamily: FONT_FAMILY.BOLD, fontSize: FONT_SIZE.XL }}

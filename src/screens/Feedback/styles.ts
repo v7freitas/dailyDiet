@@ -1,6 +1,10 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled, { css } from "styled-components/native";
 
+type Props = {
+  status: boolean;
+};
+
 export const Container = styled(SafeAreaView)`
   flex: 1;
   background-color: ${({ theme }) => theme.COLORS.GRAY_7};
@@ -9,10 +13,11 @@ export const Container = styled(SafeAreaView)`
   padding: 24px;
 `;
 
-export const Message = styled.Text`
-  ${({ theme }) => css`
+export const Message = styled.Text<Props>`
+  ${({ theme, status }) => css`
     font-size: ${theme.FONT_SIZE.XXL}px;
     font-family: ${theme.FONT_FAMILY.BOLD};
+    color: ${status === true ? theme.COLORS.GREEN_DARK : theme.COLORS.RED_DARK};
   `}
   margin-bottom: 8px;
   text-align: center;

@@ -9,7 +9,6 @@ type DietProps = {
 };
 
 export const Container = styled(TouchableOpacity)`
-  flex: 1;
   min-height: 49px;
   max-height: 49px;
   flex-direction: row;

@@ -2,7 +2,7 @@ import { Container, Description, Icon, Percentage } from "./styles";
 
 type Props = {
   type?: "PRIMARY" | "SECONDARY";
-  percentage: string;
+  percentage: number;
   onPress?: () => void;
 };
 

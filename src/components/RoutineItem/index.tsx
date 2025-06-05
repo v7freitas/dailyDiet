@@ -1,3 +1,4 @@
+import { TouchableOpacityProps } from "react-native";
 import {
   Container,
   Hour,
@@ -7,9 +8,10 @@ import {
   DietStatusTypeStyleProps,
 } from "./styles";
 
-type Props = {
+type Props = TouchableOpacityProps & {
   hour: string;
   title: string;
+  description?: string;
   type: DietStatusTypeStyleProps;
 };
 

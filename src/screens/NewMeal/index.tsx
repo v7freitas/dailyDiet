@@ -72,7 +72,6 @@ export function NewMeal() {
 
   function handleGoBack() {
     navigation.navigate("Home");
-    logAsyncStorage();
   }
 
   async function handleRegisterMeal() {
@@ -96,7 +95,9 @@ export function NewMeal() {
 
       await mealCreate(JSON.stringify(newMeal));
 
-      navigation.navigate("Feedback");
+      navigation.navigate("Feedback", {
+        status: newMeal.isOnDiet,
+      });
     } catch (error) {
       if (error instanceof AppError) {
         Alert.alert("Nova refeição", error.message);
