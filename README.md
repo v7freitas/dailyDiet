@@ -1,4 +1,4 @@
-# 🍽️ DailyDiet
+# 🍽️ Daily Diet
 
 O **DailyDiet** é uma aplicação mobile desenvolvida como projeto de estudo. O objetivo é auxiliar no controle da sua dieta diária. Com ele, você pode registrar suas refeições e acompanhar seu progresso, verificando se está dentro da sua dieta ou não.
 
@@ -28,7 +28,7 @@ git clone https://github.com/seu-usuario/DailyDiet.git
 ```
 2. Acesse a pasta do projeto
 ```
-cd DailyDiet
+cd dailyDiet
 
 ```
 
