@@ -1,24 +1,29 @@
 import { Container, Description, Icon, Percentage } from "./styles";
 
 type Props = {
-  type?: "PRIMARY" | "SECONDARY";
   percentage: number;
   onPress?: () => void;
 };
 
-export function DietPercentage({
-  type = "PRIMARY",
-  percentage,
-  onPress,
-  ...rest
-}: Props) {
+export function DietPercentage({ percentage, onPress, ...rest }: Props) {
   return (
-    <Container type={type} onPress={onPress} {...rest}>
-      <Percentage>{percentage}%</Percentage>
+    <Container
+      type={percentage < 50 ? "SECONDARY" : "PRIMARY"}
+      onPress={onPress}
+      {...rest}
+    >
+      <Percentage>
+        {isNaN(percentage)
+          ? "Sem refeições"
+          : percentage < 50
+          ? 100 - percentage
+          : percentage}
+        {isNaN(percentage) ? "" : "%"}
+      </Percentage>
       <Description>
-        das refeições {type === "PRIMARY" ? "dentro" : "fora"} da dieta
+        das refeições {percentage >= 50 ? "dentro" : "fora"} da dieta
       </Description>
-      <Icon type={type} />
+      <Icon type={percentage < 50 ? "SECONDARY" : "PRIMARY"} />
     </Container>
   );
 }

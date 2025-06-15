@@ -26,6 +26,11 @@ type SectionDataMeal = {
 
 export function Home() {
   const [dietList, setDietList] = useState<[]>([]);
+  const [mealCounter, setMealCounter] = useState(0);
+  const [mealsOnDietCounter, setMealsOnDietCounter] = useState(0);
+  const [mealsNotOnDietCounter, setMealsNotOnDietCounter] = useState(0);
+  const [mealsOnDietInSequence, setMealsOnDietInSequence] = useState(0);
+  const [dietPercentage, setDietPercentage] = useState(0);
 
   const navigation = useNavigation();
 
@@ -33,16 +38,6 @@ export function Home() {
 
   function handleNewMeal() {
     navigation.navigate("NewMeal");
-  }
-
-  function handleMealDetails() {
-    navigation.navigate("MealDetails", {
-      type: "PRIMARY",
-      name: "Exemplo de Refeição",
-      description: "Descrição da refeição",
-      date: "01/01/2023",
-      hour: "12:00",
-    });
   }
 
   const renderItem = ({
@@ -69,7 +64,13 @@ export function Home() {
   );
 
   function handleDietStatistics() {
-    navigation.navigate("DietStatistics");
+    navigation.navigate("DietStatistics", {
+      mealCounter,
+      mealsOnDietCounter,
+      mealsNotOnDietCounter: mealCounter - mealsOnDietCounter,
+      mealsOnDietInSequence,
+      dietPercentage,
+    });
   }
 
   async function fetchDietList() {
@@ -85,6 +86,13 @@ export function Home() {
         const [dd, mm, yyyy] = dateBR.split("/");
         return `${yyyy}-${mm}-${dd}`;
       };
+
+      // Ordenar os dados por data e hora (do mais antigo para o mais recente). Usado especificamente para a contagem de refeições em sequência.
+      const dataSortedByDateTime = [...data].sort((a, b) => {
+        const dateTimeA = new Date(`${parseDateToISO(a.date)}T${a.hour}`);
+        const dateTimeB = new Date(`${parseDateToISO(b.date)}T${b.hour}`);
+        return dateTimeA.getTime() - dateTimeB.getTime();
+      });
 
       // Agrupando por data
       const grouped = data.reduce((acc, item) => {
@@ -132,6 +140,31 @@ export function Home() {
         });
 
       setDietList(mealsGroupedAndSorted);
+      setMealCounter(data.length);
+      setDietPercentage(
+        Number(
+          (
+            (data.filter((item) => item.isOnDiet).length / data.length) *
+            100
+          ).toFixed(2)
+        )
+      );
+      setMealsOnDietCounter(data.filter((item) => item.isOnDiet).length);
+      setMealsNotOnDietCounter(data.filter((item) => !item.isOnDiet).length);
+      setMealsOnDietInSequence(
+        dataSortedByDateTime.reduce(
+          (max, item) => {
+            if (item.isOnDiet) {
+              max.current++;
+              max.max = Math.max(max.current, max.max);
+            } else {
+              max.current = 0;
+            }
+            return max;
+          },
+          { current: 0, max: 0 }
+        ).max
+      );
     } catch (error) {}
   }
 
@@ -144,7 +177,10 @@ export function Home() {
   return (
     <Container>
       <Header />
-      <DietPercentage percentage={80} onPress={handleDietStatistics} />
+      <DietPercentage
+        percentage={dietPercentage}
+        onPress={handleDietStatistics}
+      />
       <Text>Refeições</Text>
       <Button
         title={"Nova refeição"}

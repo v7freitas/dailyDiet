@@ -1,40 +1,40 @@
-import { Button } from "@components/Button";
-import { Container, ContainerRow, Form } from "./styles";
 import { HeaderMeal } from "@components/HeaderMeal";
 import { Input } from "@components/Input";
 import { IsOnDietButton } from "@components/IsOnDietButton";
-import { useState } from "react";
 import { Alert, Text } from "react-native";
+import { Container, ContainerRow, Form } from "./styles";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { useState } from "react";
+import { MealProps } from "@screens/NewMeal";
 import { useTheme } from "styled-components/native";
-import { useNavigation } from "@react-navigation/native";
-import { mealCreate } from "@storage/meal/mealCreate";
+import { Button } from "@components/Button";
+import { mealUpdate } from "@storage/meal/mealUpdate";
 import { mealsGetAll } from "@storage/meal/mealsGetAll";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AppError } from "@utils/AppError";
 
-export type MealProps = {
-  name: string;
-  description: string;
-  date: string;
-  hour: string;
-  isOnDiet: boolean;
-};
+export function EditMeal() {
+  const navigation = useNavigation();
+  const route = useRoute();
 
-export function NewMeal() {
   const { FONT_FAMILY } = useTheme();
 
-  const navigation = useNavigation();
+  const { meal } = route.params as { meal: MealProps };
 
-  const [newMeal, setNewMeal] = useState<MealProps>({
-    name: "",
-    description: "",
-    date: "",
-    hour: "",
-    isOnDiet: true,
+  function handleGoBack() {
+    navigation.navigate("Home");
+  }
+
+  const [editMeal, setEditMeal] = useState<MealProps>({
+    name: meal.name,
+    description: meal.description,
+    date: meal.date,
+    hour: meal.hour,
+    isOnDiet: meal.isOnDiet,
   });
 
   const updateMealField = (field: string, value: string | boolean) => {
-    setNewMeal((prev) => ({ ...prev, [field]: value }));
+    setEditMeal((prev) => ({ ...prev, [field]: value }));
   };
 
   const dateMaskAndFieldChange = (date: string) => {
@@ -47,7 +47,7 @@ export function NewMeal() {
       dateMasked = dateMasked.replace(/(\d{2})(\d{1,2})/, "$1/$2");
     }
 
-    setNewMeal((prev) => ({ ...prev, date: dateMasked }));
+    setEditMeal((prev) => ({ ...prev, date: dateMasked }));
   };
 
   const hourMaskAndFieldChange = (hour: string) => {
@@ -62,7 +62,7 @@ export function NewMeal() {
 
     //Adiciona 0 complemento :00 se necessário
 
-    setNewMeal((prev) => ({ ...prev, hour: formattedHour }));
+    setEditMeal((prev) => ({ ...prev, hour: formattedHour }));
   };
 
   const isOnDietStatus = [
@@ -70,88 +70,83 @@ export function NewMeal() {
     { title: "Não", type: "SECONDARY" },
   ];
 
-  function handleGoBack() {
-    navigation.navigate("Home");
-  }
+  const logAsyncStorage = async () => {
+    const value = await mealsGetAll();
+    console.log("AsyncStorage meals:", value);
+  };
 
-  async function handleRegisterMeal() {
+  async function handleUpdateMeal() {
     try {
       if (
-        newMeal.name.trim().length === 0 ||
-        newMeal.date.trim().length === 0 ||
-        newMeal.hour.trim().length === 0
+        editMeal.name.trim().length === 0 ||
+        editMeal.date.trim().length === 0 ||
+        editMeal.hour.trim().length === 0
       ) {
         return Alert.alert(
-          "Nova refeição",
-          "Por favor, preencha todos os campos obrigatórios."
+          "Editar refeição",
+          "Preencha todas as informações para continuar."
         );
       }
 
-      if (newMeal.hour.length === 2) {
-        newMeal.hour += ":00"; // Adiciona ":00" se a hora tiver apenas 2 dígitos
-      } else if (newMeal.hour.length === 1 && newMeal.hour !== "0") {
-        newMeal.hour = "0" + newMeal.hour + ":00"; // Adiciona "0" e ":00" se a hora tiver apenas 1 dígito
+      let formattedHour = editMeal.hour;
+
+      if (formattedHour.length === 2) {
+        formattedHour += ":00"; // Adiciona ":00" se a hora tiver apenas 2 dígitos
+      } else if (formattedHour.length === 1 && formattedHour !== "0") {
+        formattedHour = "0" + formattedHour + ":00"; // Adiciona "0" e ":00" se a hora tiver apenas 1 dígito
       }
 
-      await mealCreate(newMeal);
+      const updatedMeal = {
+        ...editMeal,
+        hour: formattedHour,
+      };
 
-      navigation.navigate("Feedback", {
-        status: newMeal.isOnDiet,
-      });
+      await mealUpdate(updatedMeal);
+
+      Alert.alert("Sucesso", "Refeição editada com sucesso!");
+
+      navigation.navigate("Home");
     } catch (error) {
       if (error instanceof AppError) {
-        Alert.alert("Nova refeição", error.message);
+        Alert.alert("Editar refeição", error.message);
       } else {
-        Alert.alert("Nova refeição", "Não foi possível cadastrar a refeição.");
-        console.log(error);
+        Alert.alert("Erro", "Não foi possível editar a refeição.");
       }
     }
+    logAsyncStorage();
   }
 
-  const logAsyncStorage = async () => {
-    const value = await mealsGetAll();
-  };
-
-  const clearAsyncStorage = async () => {
-    try {
-      await AsyncStorage.clear();
-      console.log("AsyncStorage limpo com sucesso!");
-    } catch (error) {
-      console.error("Erro ao limpar AsyncStorage:", error);
-    }
-  };
-
   return (
-    <Container type="DEFAULT">
+    <Container>
       <HeaderMeal
-        title="Nova refeição"
+        title="Editar refeição"
         type={"DEFAULT"}
         onPress={handleGoBack}
       />
       <Form>
         <Input
           label={"Nome"}
-          value={newMeal.name}
+          value={editMeal.name}
           onChangeText={(value) => updateMealField("name", value)}
         />
         <Input
           label={"Descrição"}
           isTextArea
-          value={newMeal.description}
+          value={editMeal.description}
           onChangeText={(value) => updateMealField("description", value)}
         />
         <ContainerRow>
           <Input
             label={"Data"}
             style={{ flex: 1 }}
-            value={newMeal.date}
+            value={editMeal.date}
             onChangeText={(date) => dateMaskAndFieldChange(date)}
             keyboardType="numeric"
           />
           <Input
             label={"Hora"}
             style={{ flex: 1 }}
-            value={newMeal.hour}
+            value={editMeal.hour}
             onChangeText={(hour) => hourMaskAndFieldChange(hour)}
             keyboardType="numeric"
           />
@@ -166,14 +161,14 @@ export function NewMeal() {
               title={item.title}
               type={item.title === "Sim" ? "PRIMARY" : "SECONDARY"}
               isActive={
-                (item.title === "Sim" && newMeal.isOnDiet) ||
-                (item.title === "Não" && !newMeal.isOnDiet)
+                (item.title === "Sim" && editMeal.isOnDiet) ||
+                (item.title === "Não" && !editMeal.isOnDiet)
               }
               key={item.title}
             />
           ))}
         </ContainerRow>
-        <Button title={"Cadastrar refeição"} onPress={handleRegisterMeal} />
+        <Button title={"Salvar alterações"} onPress={handleUpdateMeal} />
       </Form>
     </Container>
   );
